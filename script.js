@@ -1,3 +1,6 @@
+const errorMessage = document.querySelector("#error-message");
+const count = document.querySelector("#note-count");
+
 // ---------- 1. Select the elements we need ----------
 const form = document.querySelector("#note-form");
 const input = document.querySelector("#note-input");
@@ -13,6 +16,30 @@ const CATEGORY_LABELS = {
 
 // ---------- 2. The data: an array of note objects ----------
 let notes = [];
+
+// ---------- Validation ----------
+const MAX_LENGTH = 200;
+
+function getError(text) {
+  if (text === "") {
+    return "Please type a note first.";
+  }
+  if (text.length > MAX_LENGTH) {
+    return "Notes must be 200 characters or fewer.";
+  }
+  return ""; // no error
+}
+
+// ---------- Count message ----------
+function updateCount() {
+  if (notes.length === 0) {
+    count.textContent = "You have no notes yet.";
+  } else if (notes.length === 1) {
+    count.textContent = "You have 1 note.";
+  } else {
+    count.textContent = `You have ${notes.length} notes.`;
+  }
+}
 
 // ---------- 3. Draw the notes on the page ----------
 function render() {
@@ -44,6 +71,7 @@ function render() {
     del.type = "button";
     del.classList.add("delete-btn");
     del.textContent = "Delete";
+    del.addEventListener("click", () => deleteNote(note.id));
 
     meta.appendChild(category);
     meta.appendChild(date);
@@ -66,16 +94,37 @@ function addNote(text, category) {
 
   notes.push(newNote);
   render();
+    updateCount();
+}
+
+// ---------- Delete a note ----------
+function deleteNote(id) {
+  notes = notes.filter((note) => note.id !== id);
+  render();
+    updateCount();
 }
 
 // ---------- 5. Listen for the form ----------
+// ---------- Listen for the form ----------
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  addNote(input.value.trim(), categorySelect.value);
+
+  const text = input.value.trim();
+  const error = getError(text);
+
+  if (error !== "") {
+    errorMessage.textContent = error;
+    input.focus();
+    return; // stop here: do not add the note
+  }
+
+  errorMessage.textContent = ""; // clear any old error
+  addNote(text, categorySelect.value);
   input.value = "";
   input.focus();
 });
 
 // ---------- 6. Draw once when the page first loads ----------
 render();
+  updateCount();
 
