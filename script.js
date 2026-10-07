@@ -1,5 +1,6 @@
 const errorMessage = document.querySelector("#error-message");
 const count = document.querySelector("#note-count");
+const searchInput = document.querySelector("#search-input");
 
 // ---------- 1. Select the elements we need ----------
 const form = document.querySelector("#note-form");
@@ -15,7 +16,24 @@ const CATEGORY_LABELS = {
 };
 
 // ---------- 2. The data: an array of note objects ----------
-let notes = [];
+// ---------- 2. The data: loaded from localStorage ----------
+const STORAGE_KEY = "quicknotes";
+
+function loadNotes() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch (error) {
+    return []; // saved data was damaged: start fresh
+  }
+}
+
+function saveNotes() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+}
+
+let notes = loadNotes();
+let searchTerm = ""; // what the user is currently searching for
 
 // ---------- Validation ----------
 const MAX_LENGTH = 200;
@@ -43,9 +61,22 @@ function updateCount() {
 
 // ---------- 3. Draw the notes on the page ----------
 function render() {
-  list.replaceChildren(); // empty the list
+  list.replaceChildren();
 
-  notes.forEach((note) => {
+  // Only the notes that match the current search
+  const visibleNotes = notes.filter((note) =>
+    note.text.toLowerCase().includes(searchTerm)
+  );
+
+  // Nothing matched: say so inside the list
+  if (searchTerm !== "" && visibleNotes.length === 0) {
+    const message = document.createElement("li");
+    message.classList.add("empty-message");
+    message.textContent = "No notes match your search.";
+    list.appendChild(message);
+  }
+
+  visibleNotes.forEach((note) => {
     const li = document.createElement("li");
     li.classList.add("note", `category-${note.category}`);
 
@@ -93,6 +124,7 @@ function addNote(text, category) {
   };
 
   notes.push(newNote);
+  saveNotes();
   render();
     updateCount();
 }
@@ -100,6 +132,7 @@ function addNote(text, category) {
 // ---------- Delete a note ----------
 function deleteNote(id) {
   notes = notes.filter((note) => note.id !== id);
+  saveNotes();
   render();
     updateCount();
 }
@@ -122,6 +155,12 @@ form.addEventListener("submit", (event) => {
   addNote(text, categorySelect.value);
   input.value = "";
   input.focus();
+});
+
+// ---------- Search as the user types ----------
+searchInput.addEventListener("input", () => {
+  searchTerm = searchInput.value.trim().toLowerCase();
+  render();
 });
 
 // ---------- 6. Draw once when the page first loads ----------

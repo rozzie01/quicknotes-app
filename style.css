@@ -204,3 +204,9 @@ button:hover {
     width: 100%;
   }
 }
+
+.empty-message {
+  color: #666;
+  font-style: italic;
+  padding: 12px 0;
+}
