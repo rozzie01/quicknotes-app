@@ -1,6 +1,7 @@
 const errorMessage = document.querySelector("#error-message");
 const count = document.querySelector("#note-count");
 const searchInput = document.querySelector("#search-input");
+const clearAllBtn = document.querySelector("#clear-all-btn");
 
 // ---------- 1. Select the elements we need ----------
 const form = document.querySelector("#note-form");
@@ -137,6 +138,20 @@ function deleteNote(id) {
     updateCount();
 }
 
+// ---------- Clear all notes ----------
+function clearAllNotes() {
+  if (notes.length === 0) return; // nothing to clear
+
+  if (!confirm("Delete all notes?")) return; // user pressed Cancel
+
+  notes = [];
+  searchTerm = "";
+  searchInput.value = "";
+  saveNotes();
+  render();
+  updateCount();
+}
+
 // ---------- 5. Listen for the form ----------
 // ---------- Listen for the form ----------
 form.addEventListener("submit", (event) => {
@@ -162,6 +177,9 @@ searchInput.addEventListener("input", () => {
   searchTerm = searchInput.value.trim().toLowerCase();
   render();
 });
+
+// ---------- Clear all button ----------
+clearAllBtn.addEventListener("click", clearAllNotes);
 
 // ---------- 6. Draw once when the page first loads ----------
 render();

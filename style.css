@@ -210,3 +210,13 @@ button:hover {
   font-style: italic;
   padding: 12px 0;
 }
+
+/* Clear all button */
+#clear-all-btn {
+  background-color: #8e0000;
+  margin-bottom: 12px;
+}
+
+#clear-all-btn:hover {
+  background-color: #6b0000;
+}
