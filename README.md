@@ -45,3 +45,5 @@ No installation or build step is needed.
   reloading.
 - **Git workflow:** committing after each task made it easy to track my
   progress and see how the project grew.
+  
+  - "Clear all" button with a confirmation prompt to delete every note at once
